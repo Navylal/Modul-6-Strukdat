@@ -3,9 +3,9 @@ package Tugas;
 public class Kegiatan1 {
     private final int V = 10;
     private final String[] nodes = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
-    private int[][] adjacencyMatrix = new int[V][V];
-    private int[] inDegree = new int[V];
-    private int[] outDegree = new int[V];
+    private final int[][] adjacencyMatrix = new int[V][V];
+    private final int[] inDegree = new int[V];
+    private final int[] outDegree = new int[V];
 
     public void addEdge(int u, int v) {
         if (adjacencyMatrix[u][v] == 0) {

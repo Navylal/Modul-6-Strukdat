@@ -3,64 +3,99 @@ package Codelab;
 import java.util.*;
 
 public class Codelab {
-    private Map<String, List<String>> graph;
 
-    public Codelab() {
-        graph = new HashMap<>();
-    }
+    static final int SIZE = 5;
+    static String[] nodes = {"A", "B", "C", "D", "E"};
+    static int[][] adjMatrix = new int[SIZE][SIZE];
 
-    public void addWarehouse(String warehouse) {
-        graph.putIfAbsent(warehouse, new ArrayList<>());
-    }
+    static Map<String, Integer> nodeIndex = new HashMap<>();
+    static Map<Integer, String> indexNode = new HashMap<>();
 
-    public void addRoute(String from, String to) {
-        graph.get(from).add(to);
-    }
-
-    public void bfsShortestPaths(String start) {
-        Queue<List<String>> queue = new LinkedList<>();
-        Set<String> visited = new HashSet<>();
-        queue.offer(Arrays.asList(start));
-
-        System.out.println("Jalur terdekat dari " + start + ":");
-
-        while (!queue.isEmpty()) {
-            List<String> path = queue.poll();
-            String current = path.get(path.size() - 1);
-
-            if (!visited.contains(current)) {
-                visited.add(current);
-
-                // Print jalur
-                System.out.println(start + " -> " + current + ": " + String.join(" -> ", path));
-
-                for (String neighbor : graph.getOrDefault(current, new ArrayList<>())) {
-                    if (!visited.contains(neighbor)) {
-                        List<String> newPath = new ArrayList<>(path);
-                        newPath.add(neighbor);
-                        queue.offer(newPath);
-                    }
-                }
-            }
+    static {
+        for (int i = 0; i < SIZE; i++) {
+            nodeIndex.put(nodes[i], i);
+            indexNode.put(i, nodes[i]);
         }
     }
 
     public static void main(String[] args) {
-        Codelab lg = new Codelab();
+        // Tambahkan 7 jalur pengiriman (directed)
+        addEdge("A", "B");
+        addEdge("A", "C");
+        addEdge("B", "D");
+        addEdge("C", "D");
+        addEdge("C", "E");
+        addEdge("D", "E");
+        addEdge("E", "A");
 
-        lg.addWarehouse("A");
-        lg.addWarehouse("B");
-        lg.addWarehouse("C");
-        lg.addWarehouse("D");
-        lg.addWarehouse("E");
+        System.out.println("Adjacency Matrix:");
+        printAdjMatrix();
 
-        lg.addRoute("A", "B");
-        lg.addRoute("A", "C");
-        lg.addRoute("B", "D");
-        lg.addRoute("C", "D");
-        lg.addRoute("C", "E");
-        lg.addRoute("D", "E");
+        System.out.println("\nBFS dari gudang A:");
+        bfs("A");
 
-        lg.bfsShortestPaths("A");
+        System.out.println("\nDFS dari gudang A:");
+        dfs("A");
+    }
+
+    static void addEdge(String from, String to) {
+        int u = nodeIndex.get(from);
+        int v = nodeIndex.get(to);
+        adjMatrix[u][v] = 1;
+    }
+
+    static void printAdjMatrix() {
+        System.out.print("  ");
+        for (String n : nodes) {
+            System.out.print(n + " ");
+        }
+        System.out.println();
+
+        for (int i = 0; i < SIZE; i++) {
+            System.out.print(nodes[i] + " ");
+            for (int j = 0; j < SIZE; j++) {
+                System.out.print(adjMatrix[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    static void bfs(String start) {
+        boolean[] visited = new boolean[SIZE];
+        Queue<Integer> queue = new LinkedList<>();
+
+        int startIndex = nodeIndex.get(start);
+        visited[startIndex] = true;
+        queue.add(startIndex);
+
+        while (!queue.isEmpty()) {
+            int node = queue.poll();
+            System.out.print(indexNode.get(node) + " ");
+
+            for (int i = 0; i < SIZE; i++) {
+                if (adjMatrix[node][i] == 1 && !visited[i]) {
+                    visited[i] = true;
+                    queue.add(i);
+                }
+            }
+        }
+        System.out.println();
+    }
+
+    static void dfs(String start) {
+        boolean[] visited = new boolean[SIZE];
+        dfsUtil(nodeIndex.get(start), visited);
+        System.out.println();
+    }
+
+    static void dfsUtil(int node, boolean[] visited) {
+        visited[node] = true;
+        System.out.print(indexNode.get(node) + " ");
+
+        for (int i = 0; i < SIZE; i++) {
+            if (adjMatrix[node][i] == 1 && !visited[i]) {
+                dfsUtil(i, visited);
+            }
+        }
     }
 }
